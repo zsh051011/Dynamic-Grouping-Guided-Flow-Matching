@@ -17,6 +17,9 @@ DyGFlow extends MAC-Flow with dynamic agent grouping, group-guided hierarchical
 attention, a group-aware mixer, and group-consistency regularization for offline
 multi-agent reinforcement learning.
 
+See [DYGFLOW_DETAILS.md](DYGFLOW_DETAILS.md) for the method design,
+implementation details, and experiment notes.
+
 ## Installation
 ```bash
 # Environment (OG-MARL: https://github.com/instadeepai/og-marl)
