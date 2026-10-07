@@ -15,7 +15,7 @@ from util import *
 import distrax
 
 
-class GroupedMACFlowDiscreteAgent(flax.struct.PyTreeNode):
+class DyGFlowDiscreteAgent(flax.struct.PyTreeNode):
     rng: Any
     network: Any
     agent_names: Sequence[str] = nonpytree_field()
@@ -621,7 +621,7 @@ class GroupedMACFlowDiscreteAgent(flax.struct.PyTreeNode):
 def get_config():
     return ml_collections.ConfigDict(
         dict(
-            agent_name='grouped_macflow',
+            agent_name='dygflow',
             ob_dims=ml_collections.config_dict.placeholder(list),
             action_dim=ml_collections.config_dict.placeholder(int),
             lr=3e-4,

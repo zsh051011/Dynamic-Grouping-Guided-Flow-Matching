@@ -30,7 +30,7 @@ flags.DEFINE_string ('source',          'og_marl', 'builder')
 flags.DEFINE_string ('scenario',        '3m', 'scenario')
 flags.DEFINE_string ('dataset',         'Good',  'quality')
 flags.DEFINE_string ('save_dir',        'exp/',    'Save directory')
-flags.DEFINE_string('agent_name',       'grouped_macflow',      'Agent name')
+flags.DEFINE_string('agent_name',       'dygflow',      'Agent name')
 flags.DEFINE_string('project_name',       'test',   'WandB project name')
 flags.DEFINE_string('data_dir',       './data/',    'Directory to store datasets')
 flags.DEFINE_string('native_data_dir', '', 'Local native SMAC npy dataset directory')
@@ -51,7 +51,7 @@ flags.DEFINE_integer('num_eval_workers', 10, 'Number of parallel workers for eva
 flags.DEFINE_bool('eval_return_only', False, 'Only save return-related evaluation metrics.')
 # -----------------------------------------------------------------------------------------------
 
-config_flags.DEFINE_config_file('agent', 'agents/grouped_macflow.py', lock_config=False)
+config_flags.DEFINE_config_file('agent', 'agents/dygflow.py', lock_config=False)
 flags.DEFINE_alias('agent_config', 'agent')
 
 def main(_):
@@ -70,9 +70,9 @@ def main(_):
     agent_name = requested_agent_name
     cfg['agent_name'] = agent_name
 
-    if agent_name == 'grouped_macflow':
-        from agents.grouped_macflow import GroupedMACFlowDiscreteAgent
-        agent_cls = GroupedMACFlowDiscreteAgent
+    if agent_name == 'dygflow':
+        from agents.dygflow import DyGFlowDiscreteAgent
+        agent_cls = DyGFlowDiscreteAgent
     elif agent_name == 'macflow':
         from agents.discrete_macflow import MACFlowDiscreteAgent
         agent_cls = MACFlowDiscreteAgent
@@ -142,7 +142,7 @@ def main(_):
     importance_sum = np.zeros(len(agent_names), dtype=np.float64)
     importance_count = 0
     group_history_path = os.path.join(save_root, 'group_history.jsonl')
-    if agent_name == 'grouped_macflow':
+    if agent_name == 'dygflow':
         initial_groups = np.asarray(jax.device_get(agent.group_ids)).tolist()
         with open(group_history_path, 'w') as f:
             f.write(json.dumps({'step': 0, 'group_ids': initial_groups}) + '\n')
@@ -157,7 +157,7 @@ def main(_):
             importance_count += 1
         update_freq = int(cfg.get('group_update_freq', 0))
         if (
-            agent_name == 'grouped_macflow'
+            agent_name == 'dygflow'
             and update_freq > 0
             and step % update_freq == 0
             and importance_count > 0
@@ -184,7 +184,7 @@ def main(_):
 
         if step % FLAGS.log_interval == 0:
             metrics = {f'train/{k}': float(v) for k, v in info.items()}
-            if agent_name == 'grouped_macflow':
+            if agent_name == 'dygflow':
                 _, group_sizes = np.unique(agent.group_ids, return_counts=True)
                 metrics['train/groups/count'] = float(len(group_sizes))
                 metrics['train/groups/min_size'] = float(group_sizes.min())

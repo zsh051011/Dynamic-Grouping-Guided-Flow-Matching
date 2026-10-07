@@ -1,4 +1,4 @@
-# Grouped MAC-Flow
+# Dynamic Grouping-Guided Flow Matching (DyGFlow)
 
 这是 MAC-Flow 的独立改进副本，原目录 `../mac-flow` 未被修改。
 
@@ -50,7 +50,7 @@ XLA_PYTHON_CLIENT_PREALLOCATE=false conda run -n macflow_gpu_grouped \
   python smac_main.py \
   --env=smac_v1 \
   --scenario=25m \
-  --agent_name=grouped_macflow \
+  --agent_name=dygflow \
   --native_data_dir=../mac-flow/data/native_smac/25m/Good \
   --offline_steps=400000 \
   --batch_size=16 \
@@ -69,7 +69,7 @@ XLA_PYTHON_CLIENT_PREALLOCATE=false conda run -n macflow_gpu_grouped \
 
 ## 与原版对比边界
 
-Grouped 版本保留原 MAC-Flow 的 Q-guidance `argmax` 和 LSTM encoder 调用方式，没有把额外
+DyGFlow 保留原 MAC-Flow 的 Q-guidance `argmax` 和 LSTM encoder 调用方式，没有把额外
 基础修复混入创新实验。结构变化只来自 GroupMixer、分层注意力、SD loss、动态分组及
 分组感知推理。
 
@@ -80,7 +80,7 @@ Grouped 版本保留原 MAC-Flow 的 Q-guidance `argmax` 和 LSTM encoder 调用
 原工程保留在 `../mac-flow`，所有创新代码位于独立目录 `../mac-flow-grouped`。
 
 `smac_main.py` 的默认 agent 从原来的 `MACFlowDiscreteAgent` 改为
-`GroupedMACFlowDiscreteAgent`，配置文件改为 `agents/grouped_macflow.py`。读取样本后，
+`DyGFlowDiscreteAgent`，配置文件改为 `agents/dygflow.py`。读取样本后，
 程序根据 `example["infos"]["state"].shape[-1]` 自动设置 `state_dim`。
 
 模型参数使用入口传入的完整 shape example 初始化，与原版入口行为一致。
@@ -216,7 +216,7 @@ flow time embedding（BC flow 路径）
 
 ### 5. SD loss
 
-代码位置：`agents/grouped_macflow.py::_sd_loss`。
+代码位置：`agents/dygflow.py::_sd_loss`。
 
 SD loss 作用于一步 flow policy 的 action logits。先对 logits 做 L2 归一化，再计算智能体两两
 余弦相似度。
@@ -248,7 +248,7 @@ L_actor =
 
 ### 6. 周期 select-and-kick-out
 
-代码位置：`agents/grouped_macflow.py::update_group_assignments`。
+代码位置：`agents/dygflow.py::update_group_assignments`。
 
 初始结构为：
 
@@ -269,7 +269,7 @@ threshold_g = mean_importance_g * change_group_value
 
 ### 7. 新组 warm-start
 
-代码位置：`agents/grouped_macflow.py::_warm_start_group_slots`。
+代码位置：`agents/dygflow.py::_warm_start_group_slots`。
 
 JAX/Flax 要求参数树形状稳定，所以程序初始化时预先分配最多 `num_agents` 个组槽。未激活组
 在拆组前没有训练信号，如果直接激活其随机参数，会造成联合 Q 和策略突然跳变。
@@ -298,7 +298,7 @@ save_dict["group_ids"] = tuple(agent.group_ids)
 ```
 
 恢复 checkpoint 时，在恢复网络参数后再次恢复 `group_ids`。`eval_smac_checkpoint.py` 也已
-改为构建 `GroupedMACFlowDiscreteAgent`，保证评估使用训练结束时的真实分组。
+改为构建 `DyGFlowDiscreteAgent`，保证评估使用训练结束时的真实分组。
 
 ### 9. native NPY reader 修改
 

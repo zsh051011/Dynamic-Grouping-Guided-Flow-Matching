@@ -25,7 +25,7 @@ flags.DEFINE_string("env", "smac_v1", "Environment name")
 flags.DEFINE_string("source", "og_marl", "Dataset/environment source")
 flags.DEFINE_string("scenario", "25m", "SMAC scenario")
 flags.DEFINE_string("dataset", "Good", "Dataset tier")
-flags.DEFINE_string("agent_name", "grouped_macflow", "Agent name")
+flags.DEFINE_string("agent_name", "dygflow", "Agent name")
 flags.DEFINE_string("data_dir", "./data", "Dataset directory")
 flags.DEFINE_string("native_data_dir", "", "Local native SMAC npy dataset directory")
 flags.DEFINE_integer("num_eval_episodes", 100, "Number of evaluation episodes")
@@ -35,7 +35,7 @@ flags.DEFINE_integer("buffer_size", 320000, "Replay buffer size")
 flags.DEFINE_integer("batch_size", 8, "Batch size used for model shape initialization")
 flags.DEFINE_string("output_json", "", "Output JSON path")
 
-config_flags.DEFINE_config_file("agent", "agents/grouped_macflow.py", lock_config=False)
+config_flags.DEFINE_config_file("agent", "agents/dygflow.py", lock_config=False)
 flags.DEFINE_alias("agent_config", "agent")
 
 
@@ -172,10 +172,10 @@ def main(_):
     agent_name = FLAGS.agent_name
     cfg["agent_name"] = agent_name
 
-    if agent_name == "grouped_macflow":
-        from agents.grouped_macflow import GroupedMACFlowDiscreteAgent
+    if agent_name == "dygflow":
+        from agents.dygflow import DyGFlowDiscreteAgent
 
-        agent_cls = GroupedMACFlowDiscreteAgent
+        agent_cls = DyGFlowDiscreteAgent
     elif agent_name == "macflow":
         from agents.discrete_macflow import MACFlowDiscreteAgent
 

@@ -3,16 +3,19 @@
 <div id="user-content-toc" style="margin-bottom: 50px">
   <ul align="center" style="list-style: none;">
     <summary>
-      <h1>Multi-agent Coordination via Flow Matching</h1>
+      <h1>Dynamic Grouping-Guided Flow Matching (DyGFlow)</h1>
       <br>
-      <h2><a href="https://arxiv.org/abs/2511.05005">Paper</a></h2>
+      <h2>Dynamic Grouping-Guided Flow Matching for Offline Multi-Agent Reinforcement Learning</h2>
+      <p>Based on <a href="https://arxiv.org/abs/2511.05005">MAC-Flow</a></p>
     </summary>
   </ul>
 </div>
 </div>
 
 ## Overview
-This codebase provides an official implementation of MAC-Flow, which is an algorithm for offline MARL. 
+DyGFlow extends MAC-Flow with dynamic agent grouping, group-guided hierarchical
+attention, a group-aware mixer, and group-consistency regularization for offline
+multi-agent reinforcement learning.
 
 ## Installation
 ```bash
@@ -51,6 +54,6 @@ pip install -r requirements/baselines.txt
 ## Quick start
 
 ```bash
-# TD3BC
-python smac_main.py --env smac_v1 --source og_marl --scenario 2s3z --dataset Good --seed 0 --agent.alpha 3.0 
+# DyGFlow
+python smac_main.py --agent_name dygflow --env smac_v1 --source og_marl --scenario 2s3z --dataset Good --seed 0 --agent.alpha 3.0
 ```
